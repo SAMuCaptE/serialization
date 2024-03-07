@@ -8,7 +8,7 @@
 
 ## Documentation
 
-- ~~Dataset~~ _TODO_
+- [Dataset](docs/dataset.md)
 
 ### Setup
 
