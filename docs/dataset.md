@@ -2,79 +2,70 @@
 
 The protobuf definition can be found [here](../schemas/dataset.proto).
 
-## Max size
+Only the required fields are kept:
 
-The max size was calculated using the max values of these sensors ([reference](https://github.com/SAMuCaptE/loch/blob/main/tests/scheduler_tests/fuzz/sensor_scheduler.fuzz.md)) using [protobufpal.com](https://www.protobufpal.com/):
+- `start_time`: The moment at which the values where measured, expressed as **\_**.
+- `data`: Array of [compressed values](#data-compression) obtained.
 
-- 2 conductivity sensors
-- 2 temperature sensors
-- 2 pH sensors
+## Data compression
 
-<details>
-<summary>Test data</summary>
+Protobufs allow to easily store data as binary but do not offer as much compression as required for this particular use case.
+To optimize the available space, each measured value is encoded in the following manner.
+
+![data_frame](data_frame.jpg)
+
+The required bits are obtained according to the potential stored values. ([Reference](https://github.com/SAMuCaptE/loch/blob/main/tests/scheduler_tests/fuzz/sensor_scheduler.fuzz.md))
+
+|            | Max value | Bits                                |
+| ---------- | --------- | ----------------------------------- |
+| sensor id  | 8         | $log_2(8)=3$                        |
+| decimals   | 999       | $\lceil{ log_2(999) }\rceil = 10$   |
+| whole part | 55000     | $\lceil{ log_2(55000) }\rceil = 16$ |
+
+## Size analysis
+
+> All calculations were made using [protobufpal.com](https://www.protobufpal.com/).
+
+Both of the following cases would fit in 250kB of memory. However, the worst case is much riskier if the experimentation period is longer.
+The second case would not pose any problems and could allow to store more metadata.
+
+#### Worst case
+
+If every sensor is **activated independently**, more overhead is added to store an array of length one. This would mean that a _single_ value would use 13 bytes of storage.
+
+**Required space for a year:**
+
+$$
+365\text{ days } \times 6\text{ values/sensor/day } \times 8\text{ sensors } \times 13\text{ bytes/value } = 227760\text{ bytes }
+$$
+
+**Input:**
 
 ```json
 {
-  "start_time": 1709839797523,
-  "end_time": 1709839797524,
-  "next_wakeup_time": 1709839797525,
-  "next_sync_time": 1709839797526,
-  "data": [
-    {
-      "sensor_id": 0,
-      "unsigned": 54999,
-      "decimal_part": 999
-    },
-    {
-      "sensor_id": 1,
-      "unsigned": 54999,
-      "decimal_part": 999
-    },
-    {
-      "sensor_id": 2,
-      "signed": 34,
-      "decimal_part": 999
-    },
-    {
-      "sensor_id": 3,
-      "signed": 34,
-      "decimal_part": 999
-    },
-    {
-      "sensor_id": 4,
-      "unsigned": 13,
-      "decimal_part": 999
-    },
-    {
-      "sensor_id": 5,
-      "unsigned": 13,
-      "decimal_part": 999
-    }
-  ]
+  "start_time": 1709868480962,
+  "data": [4000000]
 }
 ```
 
-</details>
+#### Ideal case
 
-<details>
-<summary>Encoded data (86 bytes)</summary>
+If all sensors are **activated at the same time**, a dataset would use 41 bytes.
 
+**Required space for a year:**
+
+$$
+365\text{ days } \times 6\text{ datasets/day } \times 41\text{ bytes/dataset} = 89790\text{ bytes }
+$$
+
+**Input:**
+
+```json
+{
+  "start_time": 1709868480962,
+  "processing_time": 200,
+  "data": [
+    4000000, 4000000, 4000000, 4000000, 4000000, 4000000, 4000000, 4000000
+  ]
+}
 ```
-0x08 0x93 0x9A 0x93 0xD3 0xE1 0x31 0x10 0x94 0x9A 0x93 0xD3 0xE1 0x31 0x18 0x95 0x9A 0x93 0xD3 0xE1 0x31 0x20 0x96 0x9A 0x93 0xD3 0xE1 0x31 0x2A 0x09 0x08 0x00 0x10 0xD7 0xAD 0x03 0x20 0xE7 0x07 0x2A 0x09 0x08 0x01 0x10 0xD7 0xAD 0x03 0x20 0xE7 0x07 0x2A 0x07 0x08 0x02 0x18 0x22 0x20 0xE7 0x07 0x2A 0x07 0x08 0x03 0x18 0x22 0x20 0xE7 0x07 0x2A 0x07 0x08 0x04 0x10 0x0D 0x20 0xE7 0x07 0x2A 0x07 0x08 0x05 0x10 0x0D 0x20 0xE7 0x07
----
-08939a93d3e13110949a93d3e13118959a93d3e13120969a93d3e1312a09080010d7ad0320e7072a09080110d7ad0320e7072a070802182220e7072a070803182220e7072a070804100d20e7072a070805100d20e707
-```
-
-</details>
-
-## Optimization
-
-If necessary, the proposed schema could be optimized by combining fields together beforehand.
-
-- Datetimes could be expressed in seconds with `t=0` being the launch date. This would fit in a `uint32`.
-- 2 datetimes could be combined in a `uint64`. (This would remove a protobuf metadata byte)
-- `SensorValue` could be replaced by a single `uint32` .
-  > `integer_part << 16 | decimal_part << 3 | sensor_id`
-  - `integer_part` takes up to 16 bits. There should be a mechanism to detect potential negative values.
-  - `decimal_part` can be up to 999, which takes up 10 bits.
-  - `sensor_id` takes up 3 bits, which allows up to 8 different sensors.

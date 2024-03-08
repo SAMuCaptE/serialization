@@ -5,17 +5,5 @@ option go_package = "serialization.dataset";
 
 message Dataset {
   uint64 start_time = 1;
-  uint64 end_time = 2;
-  uint64 next_wakeup_time = 3;
-  uint64 next_sync_time = 4;
-  repeated SensorValue data = 5;
+  repeated uint32 data = 3;
 };
-
-message SensorValue {
-  uint32 sensor_id = 1;
-  oneof integer_part {
-    uint32 unsigned = 2;
-    int32 signed = 3;
-  }
-  uint32 decimal_part = 4;
-}
