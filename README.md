@@ -8,7 +8,7 @@
 
 ## Documentation
 
-- [Dataset](docs/dataset.md)
+- [Dataset](docs/dataset/dataset.md)
 
 ### Setup
 

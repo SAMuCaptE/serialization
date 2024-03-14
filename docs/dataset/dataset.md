@@ -4,7 +4,7 @@ The protobuf definition can be found [here](../schemas/dataset.proto).
 
 Only the required fields are kept:
 
-- `start_time`: The moment at which the values where measured, expressed as a **unix timestamp in seconds**.
+- `start_time`: The moment at which the values where measured, expressed as a [datetime](../datetime/datetime.md).
 - `data`: Array of [compressed values](#data-compression) obtained.
 
 ## Data compression
