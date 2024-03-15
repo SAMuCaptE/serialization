@@ -9,6 +9,7 @@
 ## Documentation
 
 - [Dataset](docs/dataset/dataset.md)
+- [Datetime](docs/datetime/datetime.md)
 
 ### Setup
 
