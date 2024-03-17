@@ -4,6 +4,6 @@ package dataset;
 option go_package = "serialization.dataset";
 
 message Dataset {
-  uint64 start_time = 1;
-  repeated uint32 data = 3;
+  uint32 start_time = 1;
+  repeated uint32 data = 2;
 };

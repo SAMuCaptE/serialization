@@ -4,7 +4,7 @@ The protobuf definition can be found [here](../schemas/dataset.proto).
 
 Only the required fields are kept:
 
-- `start_time`: The moment at which the values where measured, expressed as **\_**.
+- `start_time`: The moment at which the values where measured, expressed as a [datetime](../datetime/datetime.md).
 - `data`: Array of [compressed values](#data-compression) obtained.
 
 ## Data compression
@@ -31,38 +31,38 @@ The second case would not pose any problems and could allow to store more metada
 
 #### Worst case
 
-If every sensor is **activated independently**, more overhead is added to store an array of length one. This would mean that a _single_ value would use 13 bytes of storage.
+If every sensor is **activated independently**, more overhead is added to store an array of length one. This would mean that a _single_ value would use 11 bytes of storage.
 
 **Required space for a year:**
 
 $$
-365\text{ days } \times 6\text{ values/sensor/day } \times 8\text{ sensors } \times 13\text{ bytes/value } = 227760\text{ bytes }
+365\text{ days } \times 6\text{ values/sensor/day } \times 8\text{ sensors } \times 11\text{ bytes/value } = 192720\text{ bytes }
 $$
 
 **Input:**
 
 ```json
 {
-  "start_time": 1709868480962,
+  "start_time": 1710424263,
   "data": [4000000]
 }
 ```
 
 #### Ideal case
 
-If all sensors are **activated at the same time**, a dataset would use 41 bytes.
+If all sensors are **activated at the same time**, a dataset would use 40 bytes.
 
 **Required space for a year:**
 
 $$
-365\text{ days } \times 6\text{ datasets/day } \times 41\text{ bytes/dataset} = 89790\text{ bytes }
+365\text{ days } \times 6\text{ datasets/day } \times 40\text{ bytes/dataset} = 87600\text{ bytes }
 $$
 
 **Input:**
 
 ```json
 {
-  "start_time": 1709868480962,
+  "start_time": 1710424263,
   "processing_time": 200,
   "data": [
     4000000, 4000000, 4000000, 4000000, 4000000, 4000000, 4000000, 4000000

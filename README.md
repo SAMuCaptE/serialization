@@ -8,7 +8,8 @@
 
 ## Documentation
 
-- [Dataset](docs/dataset.md)
+- [Dataset](docs/dataset/dataset.md)
+- [Datetime](docs/datetime/datetime.md)
 
 ### Setup
 
