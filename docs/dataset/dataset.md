@@ -1,6 +1,6 @@
 # Dataset
 
-The protobuf definition can be found [here](../schemas/dataset.proto).
+The protobuf definition can be found [here](../../schemas/dataset.proto).
 
 Only the required fields are kept:
 
