@@ -14,7 +14,7 @@ To optimize the available space, each measured value is encoded in the following
 
 ![data_frame](data_frame.jpg)
 
-The required bits are obtained according to the potential stored values. ([Reference](https://github.com/SAMuCaptE/loch/blob/main/tests/scheduler_tests/fuzz/sensor_scheduler.fuzz.md))
+The required bits are obtained according to the potential stored values. ([Reference](https://github.com/SAMuCaptE/loch/blob/main/tests/fuzz/sensor_scheduler.fuzz.md#intervalles-r%C3%A9els))
 
 |            | Max value | Bits                                |
 | ---------- | --------- | ----------------------------------- |
